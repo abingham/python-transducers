@@ -41,8 +41,11 @@ import unittest
 
 
 def compose(*transducers):
+    if not transducers:
+        raise ValueError('compose() requires at least one function.')
+
     def transducer(reducer):
-        return reduce(lambda r, n: n(r),
+        return reduce(lambda r, t: t(r),
                       transducers,
                       reducer)
     return transducer
