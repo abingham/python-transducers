@@ -50,13 +50,20 @@ def compose(*transducers):
 
 def mapping(f):
     def transducer(reducer):
-        return lambda r, n: reducer(r, f(n))
+        def new_reducer(result, new_value):
+            return reducer(result, f(new_value))
+        return new_reducer
     return transducer
 
 
 def filtering(pred):
     def transducer(reducer):
-        return lambda r, n: reducer(r, n) if pred(n) else r
+        def new_reducer(result, new_value):
+            if pred(new_value):
+                return reducer(result, new_value)
+            else:
+                return result
+        return new_reducer
     return transducer
 
 
@@ -77,7 +84,7 @@ class Tests(unittest.TestCase):
             x,
             sum(x for x in range(10) if x < 5))
 
-    def test_compose(self):
+    def test_compose_mapping_and_filter(self):
         tdx = compose(
             mapping(lambda x: x * 2),
             filtering(lambda x: x < 5))
@@ -90,5 +97,22 @@ class Tests(unittest.TestCase):
             reduce(operator.mul,
                    (i * 2 for i in range(1, 10) if i < 5),
                    1))
+
+    def test_compose_three_transducers(self):
+        tdx = compose(
+            filtering(lambda x: x % 2 == 0),
+            mapping(lambda x: x * x),
+            mapping(lambda x: x * 2))
+
+        x = reduce(tdx(operator.add),
+                   range(100), 0)
+
+        self.assertEqual(
+            x,
+            sum(filter(lambda x: x % 2 == 0,
+                       (x * x
+                        for x in (y * 2
+                                  for y in range(100))))))
+
 
 unittest.main(exit=False)
