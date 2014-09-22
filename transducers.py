@@ -35,12 +35,30 @@
 # ;;becomes
 # (reduce ((mapping inc) +) 0 [1 2 3 4])
 
+import doctest
 from functools import reduce
 import operator
+import sys
 import unittest
 
 
 def compose(*transducers):
+    """Compose one or more transducers into a single transducer.
+
+    For example, this composes a mapping and a filtering in a
+    mapping-of-a-filtering:
+
+    >>> tdx = compose(
+    ...     mapping(lambda x: x * 2),
+    ...     filtering(lambda x: x < 5))
+    ...
+    >>> x = reduce(tdx(operator.mul),
+    ...            range(1, 10), 1)
+    ...
+    >>> seq = (i * 2 for i in range(1, 10) if i < 5)
+    >>> y = reduce(operator.mul, seq, 1)
+    >>> assert x == y
+    """
     if not transducers:
         raise ValueError('compose() requires at least one function.')
 
@@ -52,6 +70,15 @@ def compose(*transducers):
 
 
 def mapping(f):
+    """Create a transducer that maps a callable over the input values.
+
+    For example, this maps `x * 2` over a range:
+
+    >>> tdx = mapping(lambda x: x * 2)
+    >>> x = reduce(tdx(operator.add), range(10), 0)
+    >>> y = sum(x * 2 for x in range(10))
+    >>> assert x == y
+    """
     def transducer(reducer):
         def new_reducer(result, new_value):
             return reducer(result, f(new_value))
@@ -60,6 +87,13 @@ def mapping(f):
 
 
 def filtering(pred):
+    """Create a transducer that filters input values.
+
+    >>> tdx = filtering(lambda x: x < 5)
+    >>> x = reduce(tdx(operator.add), range(10), 0)
+    >>> y = sum(x for x in range(10) if x < 5)
+    >>> assert x == y
+    """
     def transducer(reducer):
         def new_reducer(result, new_value):
             if pred(new_value):
@@ -70,22 +104,11 @@ def filtering(pred):
     return transducer
 
 
-class Tests(unittest.TestCase):
-    def test_mapping(self):
-        tdx = mapping(lambda x: x * 2)
-        x = reduce(tdx(operator.add),
-                   range(10), 0)
-        self.assertEqual(
-            x,
-            sum(x * 2 for x in range(10)))
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(sys.modules[__name__]))
+    return tests
 
-    def test_filtering(self):
-        tdx = filtering(lambda x: x < 5)
-        x = reduce(tdx(operator.add),
-                   range(10), 0)
-        self.assertEqual(
-            x,
-            sum(x for x in range(10) if x < 5))
+class Tests(unittest.TestCase):
 
     def test_compose_mapping_and_filter(self):
         tdx = compose(
@@ -117,5 +140,7 @@ class Tests(unittest.TestCase):
                         for x in (y * 2
                                   for y in range(100))))))
 
+def test():
+    unittest.main(exit=False)
 
-unittest.main(exit=False)
+test()
