@@ -28,7 +28,7 @@ Quickstart
 Here's how you can implement Rich Hickey's example ``((def xform (comp
 (map inc) (filter even?)))`` using `transducers`.
 
-```
+```python
 from transducers import compose, filtering, mapping
 
 # A reducer for appending to a list.
