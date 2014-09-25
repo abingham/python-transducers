@@ -1,3 +1,6 @@
+### Status
+[![Build Status](https://travis-ci.org/abingham/python-transducers.png)](https://travis-ci.org/abingham/python-transducers)
+
 python-transducers
 ==================
 
