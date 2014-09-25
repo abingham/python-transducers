@@ -66,7 +66,9 @@ def filtering(pred):
     return transducer
 
 
-class Taking:
+class _Taking:
+    """Core implementation of the `taking` transducer.
+    """
     def __init__(self, n, reducer):
         self.n = n
         self.count = 0
@@ -91,5 +93,5 @@ def taking(n):
 
     """
     def transducer(reducer):
-        return Taking(n, reducer)
+        return _Taking(n, reducer)
     return transducer
