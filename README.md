@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/abingham/python-transducers.png)](https://travis-ci.org/abingham/python-transducers)
+[![Code health](https://landscape.io/github/abingham/python-transducers/master/landscape.png)](https://landscape.io/github/abingham/python-transducers)
 
 python-transducers
 ==================
