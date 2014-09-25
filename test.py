@@ -1,5 +1,6 @@
 import doctest
 from functools import reduce
+import itertools
 import operator
 import unittest
 
@@ -10,6 +11,10 @@ def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite(tdc))
     return tests
 
+
+def append(l, item):
+    l.append(item)
+    return l
 
 class Tests(unittest.TestCase):
 
@@ -42,6 +47,19 @@ class Tests(unittest.TestCase):
                        (x * x
                         for x in (y * 2
                                   for y in range(100))))))
+
+    def test_reuse_single_taking_instance(self):
+        take_5 = tdc.taking(5)
+        tdx = tdc.compose(
+            take_5,
+            tdc.mapping(lambda x: x * 2),
+            take_5)
+        x = reduce(tdx(append), range(100), [])
+        y = itertools.islice(
+            (x * 2 for x in itertools.islice(range(100), 5)), 5)
+        self.assertEqual(x, list(y))
+
+
 
 
 def test():

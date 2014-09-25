@@ -64,3 +64,32 @@ def filtering(pred):
                 return result
         return new_reducer
     return transducer
+
+
+class Taking:
+    def __init__(self, n, reducer):
+        self.n = n
+        self.count = 0
+        self.reducer = reducer
+
+    def __call__(self, result, new_value):
+        if self.count < self.n:
+            self.count += 1
+            return self.reducer(result, new_value)
+        return result
+
+
+def taking(n):
+    """Create a transducer that stop processing input after a specified
+    number of values.
+
+    >>> import operator
+    >>> tdx = taking(5)
+    >>> x = reduce(tdx(operator.add), range(100), 0)
+    >>> y = sum(range(5))
+    >>> assert x == y
+
+    """
+    def transducer(reducer):
+        return Taking(n, reducer)
+    return transducer
