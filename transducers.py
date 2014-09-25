@@ -85,6 +85,11 @@ def taking(n):
     """Create a transducer that stop processing input after a specified
     number of values.
 
+    Note that each reducer produced by `taking` transducers is
+    independent. That is, you can produce multiple reducers from the
+    same `taking` transducer, and each reducer will take the same,
+    full count of items.
+
     >>> import operator
     >>> tdx = taking(5)
     >>> x = reduce(tdx(operator.add), range(100), 0)
