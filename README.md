@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/abingham/python-transducers.png)](https://travis-ci.org/abingham/python-transducers)
 [![Code health](https://landscape.io/github/abingham/python-transducers/master/landscape.png)](https://landscape.io/github/abingham/python-transducers)
 
+==================
 python-transducers
 ==================
 
@@ -32,7 +33,9 @@ Here's how you can implement Rich Hickey's example ``((def xform (comp
 (map inc) (filter even?)))`` using `transducers`.
 
 ```python
-from transducers import compose, filtering, mapping
+from functools import reduce
+from transducers.compose import compose
+from transducers.transducers import filtering, mapping
 
 # A reducer for appending to a list.
 def append(l, item):
@@ -46,7 +49,7 @@ inc = mapping(lambda x: x + 1)
 evens = filtering(lambda x: x % 2 == 0)
 
 # a composite transducer of inc and evens -> inc(evens(seq))
-odds = compose(inc, events)
+odds = compose(inc, evens)
 
 # Apply the composite transducer to the first 10 non-negative integers,
 # building a list out of the results.
@@ -55,3 +58,14 @@ x = reduce(odds(append), range(10), list())
 # See that you've indeed got [1, 3, 5, 7, 9]
 assert x == list(range(1, 10, 2))
 ```
+
+Coroutines
+==========
+
+You may have noticed that there's a `coroutines` module in here as
+well. It turns out that coroutines and transducers are similarly
+composable, even to the degree that a single `compose()` function
+works for both of them. So in the interest of pure curiousity I've
+added a parallel coroutines modules to match the transducers. As with
+transducers, I have no idea if this is practical or useful, but it
+sure is pretty.
