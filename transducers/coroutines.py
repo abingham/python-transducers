@@ -13,13 +13,13 @@ def coroutine(func):
     >>> @coroutine
     ... def printer():
     ...     while True:
-    ...         print('Received:', (yield))
+    ...         print((yield))
     >>> p = printer()
     >>> for i in range(3):
     ...     p.send(i)
-    Received: 0
-    Received: 1
-    Received: 2
+    0
+    1
+    2
 
     This was taken from Dave Beazley:
     http://www.dabeaz.com/coroutines/Coroutines.pdf
