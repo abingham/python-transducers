@@ -1,7 +1,3 @@
-from functools import reduce
-from itertools import chain
-
-
 def coroutine(func):
     """A decorator for simplifying coroutines.
 
