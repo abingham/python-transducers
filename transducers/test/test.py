@@ -4,7 +4,8 @@ import itertools
 import operator
 import unittest
 
-import transducers as tdc
+import transducers.transducers as tdc
+from transducers.compose import compose
 
 
 def load_tests(loader, tests, ignore):
@@ -16,10 +17,11 @@ def append(l, item):
     l.append(item)
     return l
 
+
 class Tests(unittest.TestCase):
 
     def test_compose_mapping_and_filter(self):
-        tdx = tdc.compose(
+        tdx = compose(
             tdc.mapping(lambda x: x * 2),
             tdc.filtering(lambda x: x < 5))
 
@@ -33,7 +35,7 @@ class Tests(unittest.TestCase):
                    1))
 
     def test_compose_three_transducers(self):
-        tdx = tdc.compose(
+        tdx = compose(
             tdc.filtering(lambda x: x % 2 == 0),
             tdc.mapping(lambda x: x * x),
             tdc.mapping(lambda x: x * 2))
@@ -50,7 +52,7 @@ class Tests(unittest.TestCase):
 
     def test_reuse_single_taking_instance(self):
         take_5 = tdc.taking(5)
-        tdx = tdc.compose(
+        tdx = compose(
             take_5,
             tdc.mapping(lambda x: x * 2),
             take_5)

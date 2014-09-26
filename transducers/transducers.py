@@ -1,34 +1,3 @@
-from functools import reduce
-
-
-def compose(*transducers):
-    """Compose one or more transducers into a single transducer.
-
-    For example, this composes a mapping and a filtering in a
-    mapping-of-a-filtering:
-
-    >>> import operator
-    >>> tdx = compose(
-    ...     mapping(lambda x: x * 2),
-    ...     filtering(lambda x: x < 5))
-    ...
-    >>> x = reduce(tdx(operator.mul),
-    ...            range(1, 10), 1)
-    ...
-    >>> seq = (i * 2 for i in range(1, 10) if i < 5)
-    >>> y = reduce(operator.mul, seq, 1)
-    >>> assert x == y
-    """
-    if not transducers:
-        raise ValueError('compose() requires at least one function.')
-
-    def transducer(reducer):
-        return reduce(lambda r, t: t(r),
-                      transducers,
-                      reducer)
-    return transducer
-
-
 def mapping(f):
     """Create a transducer that maps a callable over the input values.
 
