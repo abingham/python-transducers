@@ -59,6 +59,15 @@ x = reduce(odds(append), range(10), list())
 assert x == list(range(1, 10, 2))
 ```
 
+Testing
+=======
+
+`transducers` testing uses Python's standard `unittest` and `doctest` modules. To run the tests, go to the root of the project and run:
+
+```
+python -m unittest discover transducers/test
+```
+
 Coroutines
 ==========
 
