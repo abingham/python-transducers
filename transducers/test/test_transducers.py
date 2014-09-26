@@ -60,12 +60,3 @@ class Tests(unittest.TestCase):
         y = itertools.islice(
             (x * 2 for x in itertools.islice(range(100), 5)), 5)
         self.assertEqual(x, list(y))
-
-
-
-
-def test():
-    unittest.main(exit=False)
-
-if __name__ == '__main__':
-    test()

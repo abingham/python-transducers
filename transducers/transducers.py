@@ -3,6 +3,7 @@ def mapping(f):
 
     For example, this maps `x * 2` over a range:
 
+    >>> from functools import reduce
     >>> import operator
     >>> tdx = mapping(lambda x: x * 2)
     >>> x = reduce(tdx(operator.add), range(10), 0)
@@ -19,6 +20,7 @@ def mapping(f):
 def filtering(pred):
     """Create a transducer that filters input values.
 
+    >>> from functools import reduce
     >>> import operator
     >>> tdx = filtering(lambda x: x < 5)
     >>> x = reduce(tdx(operator.add), range(10), 0)
@@ -59,6 +61,7 @@ def taking(n):
     same `taking` transducer, and each reducer will take the same,
     full count of items.
 
+    >>> from functools import reduce
     >>> import operator
     >>> tdx = taking(5)
     >>> x = reduce(tdx(operator.add), range(100), 0)
