@@ -59,3 +59,9 @@ class Tests(unittest.TestCase):
         y = itertools.islice(
             (x * 2 for x in itertools.islice(range(100), 5)), 5)
         self.assertEqual(x, list(y))
+
+    def test_taking_does_not_consume_all_input(self):
+        take_5 = tdc.taking(5)
+        input_data = (i for i in range(100))
+        x = tdc.reduce(take_5(operator.add), input_data, 0)
+        self.assertEqual(len(list(input_data)), 95)
