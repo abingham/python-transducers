@@ -1,5 +1,4 @@
 import doctest
-from functools import reduce
 import itertools
 import operator
 import unittest
@@ -25,12 +24,12 @@ class Tests(unittest.TestCase):
             tdc.mapping(lambda x: x * 2),
             tdc.filtering(lambda x: x < 5))
 
-        x = reduce(tdx(operator.mul),
+        x = tdc.reduce(tdx(operator.mul),
                    range(1, 10), 1)
 
         self.assertEqual(
             x,
-            reduce(operator.mul,
+            tdc.reduce(operator.mul,
                    (i * 2 for i in range(1, 10) if i < 5),
                    1))
 
@@ -40,7 +39,7 @@ class Tests(unittest.TestCase):
             tdc.mapping(lambda x: x * x),
             tdc.mapping(lambda x: x * 2))
 
-        x = reduce(tdx(operator.add),
+        x = tdc.reduce(tdx(operator.add),
                    range(100), 0)
 
         self.assertEqual(
@@ -56,7 +55,7 @@ class Tests(unittest.TestCase):
             take_5,
             tdc.mapping(lambda x: x * 2),
             take_5)
-        x = reduce(tdx(append), range(100), [])
+        x = tdc.reduce(tdx(append), range(100), [])
         y = itertools.islice(
             (x * 2 for x in itertools.islice(range(100), 5)), 5)
         self.assertEqual(x, list(y))

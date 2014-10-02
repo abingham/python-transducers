@@ -1,3 +1,15 @@
+import functools
+import itertools
+
+class StopTransduction(Exception):
+    def __init__(self, value):
+        self._value = value
+
+    @property
+    def value(self):
+        return self._value
+
+
 def mapping(f):
     """Create a transducer that maps a callable over the input values.
 
@@ -48,8 +60,12 @@ class _Taking:
     def __call__(self, result, new_value):
         if self.count < self.n:
             self.count += 1
-            return self.reducer(result, new_value)
-        return result
+            result = self.reducer(result, new_value)
+
+        if self.count == self.n:
+            raise StopTransduction(result)
+        else:
+            return result
 
 
 def taking(n):
@@ -61,7 +77,6 @@ def taking(n):
     same `taking` transducer, and each reducer will take the same,
     full count of items.
 
-    >>> from functools import reduce
     >>> import operator
     >>> tdx = taking(5)
     >>> x = reduce(tdx(operator.add), range(100), 0)
@@ -72,3 +87,20 @@ def taking(n):
     def transducer(reducer):
         return _Taking(n, reducer)
     return transducer
+
+
+# TODO: Consider monkey-patching functools.reduce with this!
+
+_REDUCE_NO_INITIAL = object()
+def reduce(func, seq, initial=_REDUCE_NO_INITIAL):
+    """A drop-in replacement for `functools.reduce` which honors the
+    transduction protocol for stopping reduction early when
+    `StopTransduction` is received.
+    """
+    try:
+        if initial is _REDUCE_NO_INITIAL:
+            return functools.reduce(func, seq)
+        else:
+            return functools.reduce(func, seq, initial)
+    except StopTransduction as e:
+        return e.value
