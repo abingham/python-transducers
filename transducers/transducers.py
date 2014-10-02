@@ -78,13 +78,17 @@ class _Taking:
 
 
 def taking(n):
-    """Create a transducer that stop processing input after a specified
-    number of values.
+    """Create a transducer that stop processing producing a specified
+    number of output.
 
     Note that each reducer produced by `taking` transducers is
     independent. That is, you can produce multiple reducers from the
     same `taking` transducer, and each reducer will take the same,
     full count of items.
+
+    Also note that `taking` only promises to produce a set number
+    outputs. It may *consume* more than that number of inputs
+    depending on whether an initial value is supplied for reduction.
 
     >>> import operator
     >>> tdx = taking(5)
