@@ -3,11 +3,19 @@ import itertools
 
 
 class StopTransduction(Exception):
+    """Thrown by reducers to indicate that reduction should stop.
+
+    This allows reducers to terminate consumption of the input
+    sequence early. This is useful e.g. for creating reducers which
+    only process a limited number of input elements.
+    """
     def __init__(self, value):
         self._value = value
 
     @property
     def value(self):
+        """The result of the reduction.
+        """
         return self._value
 
 
