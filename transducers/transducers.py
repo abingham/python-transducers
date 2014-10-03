@@ -89,7 +89,7 @@ class StopTransduction(Exception):
 mapping = _make_transducer_factory(coroutines.mapping)
 filtering = _make_transducer_factory(coroutines.filtering)
 taking = _make_transducer_factory(coroutines.taking)
-
+taking_while = _make_transducer_factory(coroutines.taking_while)
 
 _REDUCE_NO_INITIAL = object()
 def reduce(func, seq, initial=_REDUCE_NO_INITIAL):

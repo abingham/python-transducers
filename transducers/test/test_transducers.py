@@ -34,6 +34,11 @@ class Tests(unittest.TestCase):
         x = tdc.reduce(t(operator.add), range(100), 0)
         self.assertEqual(x, sum(range(10)))
 
+    def test_taking_while(self):
+        t = tdc.taking_while(lambda x: x < 10)
+        x = tdc.reduce(t(operator.add), range(100), 0)
+        self.assertEqual(x, sum(range(10)))
+
     def test_compose_mapping_and_filter(self):
         tdx = compose(
             tdc.mapping(lambda x: x * 2),
@@ -78,5 +83,11 @@ class Tests(unittest.TestCase):
     def test_taking_does_not_consume_all_input(self):
         take_5 = tdc.taking(5)
         input_data = (i for i in range(100))
-        x = tdc.reduce(take_5(operator.add), input_data, 0)
+        tdc.reduce(take_5(operator.add), input_data, 0)
         self.assertEqual(len(list(input_data)), 95)
+
+    def test_taking_while_does_not_consume_all_input(self):
+        lt_10 = tdc.taking_while(lambda x: x < 10)
+        input_data = (i for i in range(100))
+        tdc.reduce(lt_10(operator.add), input_data, 0)
+        self.assertEqual(len(list(input_data)), 89)

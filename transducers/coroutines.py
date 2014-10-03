@@ -98,9 +98,6 @@ def taking(n):
     """Create a coroutine that only passes along the first `n` items it
     receives.
 
-    Note that a `taking` simply ignores every item after the first
-    `n`. They are still "consumed", but no downstream coroutine will see them.
-
     >>> result = []
     >>> consume(taking(5)(append(result)), range(1000))
     >>> assert result == list(range(5))
@@ -116,6 +113,26 @@ def taking(n):
                 count += 1
 
             if count == n:
+                raise StopConsumption()
+
+    return gen
+
+
+def taking_while(pred):
+    """Create a coroutine that only consumes input while a predicate
+    returns True for input values.
+
+    >>> result = []
+    >>> consume(taking_while(lambda x: x < 5)(append(result)), range(1000))
+    >>> assert result == list(range(5))
+    """
+    @coroutine
+    def gen(target):
+        while True:
+            x = (yield)
+            if pred(x):
+                target.send(x)
+            else:
                 raise StopConsumption()
 
     return gen
