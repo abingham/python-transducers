@@ -27,6 +27,24 @@ def coroutine(func):
     return start
 
 
+class StopConsumption(Exception):
+    """Thrown by coroutines when input processing should stop.
+    """
+    pass
+
+
+def consume(pipeline, seq):
+    """Pass consecutive elements from `seq` into `pipeline` until either
+    `seq` is exhausted or `pipeline.send` raises `StopConsumption`.
+
+    """
+    try:
+        for value in seq:
+            pipeline.send(value)
+    except StopConsumption:
+        pass
+
+
 @coroutine
 def append(l):
     """A coroutine that appends items to a list.
@@ -44,10 +62,7 @@ def mapping(f):
 
     >>> result = []
     >>> m = mapping(lambda x: x * 2)
-    >>> c = m(append(result))
-    >>> for i in range(10):
-    ...     c.send(i)
-    ...
+    >>> consume(m(append(result)), range(10))
     >>> assert result == [x * 2 for x in range(10)]
 
     """
@@ -66,10 +81,7 @@ def filtering(pred):
 
     >>> result = []
     >>> f = filtering(lambda x: x % 2 == 0)
-    >>> c = f(append(result))
-    >>> for i in range(10):
-    ...     c.send(i)
-    ...
+    >>> consume(f(append(result)), range(10))
     >>> assert result == [x for x in range(10) if x % 2 == 0]
 
     """
@@ -90,11 +102,7 @@ def taking(n):
     `n`. They are still "consumed", but no downstream coroutine will see them.
 
     >>> result = []
-    >>> appender = append(result)
-    >>> t = taking(5)
-    >>> c = t(append(result))
-    >>> for i in range(1000):
-    ...    c.send(i)
+    >>> consume(taking(5)(append(result)), range(1000))
     >>> assert result == list(range(5))
 
     """
@@ -106,4 +114,8 @@ def taking(n):
             if count < n:
                 target.send(x)
                 count += 1
+
+            if count == n:
+                raise StopConsumption()
+
     return gen

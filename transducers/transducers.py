@@ -1,9 +1,76 @@
 import functools
 import itertools
 
+from transducers import coroutines
+
+
+class _ResultHolder:
+    """A simple 'box' to hold the final result of a pipeline of
+    coroutines.
+    """
+    def __init__(self, init=None):
+        self.value = init
+
+
+@coroutines.coroutine
+def _reduction_target(reducer, rh):
+    "The 'tail' of the coroutine transformation pipeline."
+    while True:
+        new_value = (yield)
+        rh.value = reducer(rh.value, new_value)
+
+
+def _make_transducer_factory(make_coroutine):
+    """Convert coroutine factories into transducer factories.
+
+    Given a callable that returns a coroutine, this returns a callable
+    that produces transducers that perform their transformations using
+    the generated coroutines.. `make_coroutine` may accept any number
+    of arguments and keywords; the callabled returned from this
+    function will accept those same arguments and pass them along to
+    `make_coroutine`.
+
+    This is primarily an implementation detail that allows us to
+    define general-purpose coroutines and conveniently convert those
+    into transducers. You normally won't need to use this directly.
+
+    If you decide to use it, though, here's how it works:
+
+    >>> import operator
+    >>> m = _make_transducer_factory(coroutines.mapping)
+    >>> transducer = m(lambda x: x * 2)
+    >>> reducer = transducer(operator.add)
+    >>> x = reduce(reducer, range(10), 0)
+    >>> assert x == sum(x * 2 for x in range(10))
+
+    """
+    def make_transducer(*args, **kwargs):
+        def transducer(reducer):
+            rh = _ResultHolder() # This holds the final transduction result.
+
+            # The coroutine transformation pipeline, ending in `reduction_target`.
+            pipeline = make_coroutine(*args, **kwargs)(_reduction_target(reducer, rh))
+
+            def new_reducer(result, new_value):
+                """A reducer that uses a coroutine pipeline to transform its input
+                before reduction.
+                """
+
+                rh.value = result
+                try:
+                    pipeline.send(new_value)
+                except coroutines.StopConsumption:
+                    raise StopTransduction(rh.value)
+
+                return rh.value
+
+            return new_reducer
+        return transducer
+    return make_transducer
+
 
 class StopTransduction(Exception):
-    """Thrown by reducers to indicate that reduction should stop.
+    """Thrown to indicate that reduction should stop.
 
     This allows reducers to terminate consumption of the input
     sequence early. This is useful e.g. for creating reducers which
@@ -19,111 +86,10 @@ class StopTransduction(Exception):
         return self._value
 
 
-def mapping(f):
-    """Create a transducer that maps a callable over the input values.
+mapping = _make_transducer_factory(coroutines.mapping)
+filtering = _make_transducer_factory(coroutines.filtering)
+taking = _make_transducer_factory(coroutines.taking)
 
-    For example, this maps `x * 2` over a range:
-
-    >>> from functools import reduce
-    >>> import operator
-    >>> tdx = mapping(lambda x: x * 2)
-    >>> x = reduce(tdx(operator.add), range(10), 0)
-    >>> y = sum(x * 2 for x in range(10))
-    >>> assert x == y
-    """
-    def transducer(reducer):
-        def new_reducer(result, new_value):
-            return reducer(result, f(new_value))
-        return new_reducer
-    return transducer
-
-
-def filtering(pred):
-    """Create a transducer that filters input values.
-
-    >>> from functools import reduce
-    >>> import operator
-    >>> tdx = filtering(lambda x: x < 5)
-    >>> x = reduce(tdx(operator.add), range(10), 0)
-    >>> y = sum(x for x in range(10) if x < 5)
-    >>> assert x == y
-    """
-    def transducer(reducer):
-        def new_reducer(result, new_value):
-            if pred(new_value):
-                return reducer(result, new_value)
-            else:
-                return result
-        return new_reducer
-    return transducer
-
-
-class _Taking:
-    """Core implementation of the `taking` transducer.
-    """
-    def __init__(self, n, reducer):
-        self.n = n
-        self.count = 0
-        self.reducer = reducer
-
-    def __call__(self, result, new_value):
-        if self.count < self.n:
-            self.count += 1
-            result = self.reducer(result, new_value)
-
-        if self.count == self.n:
-            raise StopTransduction(result)
-        else:
-            return result
-
-
-def taking(n):
-    """Create a transducer that stop processing producing a specified
-    number of output.
-
-    Note that each reducer produced by `taking` transducers is
-    independent. That is, you can produce multiple reducers from the
-    same `taking` transducer, and each reducer will take the same,
-    full count of items.
-
-    Also note that `taking` only promises to produce a set number
-    outputs. It may *consume* more than that number of inputs
-    depending on whether an initial value is supplied for reduction.
-
-    >>> import operator
-    >>> tdx = taking(5)
-    >>> x = reduce(tdx(operator.add), range(100), 0)
-    >>> y = sum(range(5))
-    >>> assert x == y
-
-    """
-    def transducer(reducer):
-        return _Taking(n, reducer)
-    return transducer
-
-
-def take_while(pred):
-    """Create a transducer that stops producing output when an input value
-    fails a predicate.
-
-    Note that `pred` is shared among all reducers generated by a
-    single transducer output from `take_while`.
-
-    >>> import operator
-    >>> lt_10 = take_while(lambda x: x < 10)
-    >>> x = reduce(lt_10(operator.add), range(100), 0)
-    >>> y = sum(range(10))
-    >>> assert x == y
-    """
-    def transducer(reducer):
-        def new_reducer(result, new_value):
-            if pred(new_value):
-                return reducer(result, new_value)
-            raise StopTransduction(result)
-        return new_reducer
-    return transducer
-
-# TODO: Consider monkey-patching functools.reduce with this!
 
 _REDUCE_NO_INITIAL = object()
 def reduce(func, seq, initial=_REDUCE_NO_INITIAL):

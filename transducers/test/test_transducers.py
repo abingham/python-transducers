@@ -19,6 +19,21 @@ def append(l, item):
 
 class Tests(unittest.TestCase):
 
+    def test_mapping(self):
+        tdx = tdc.mapping(lambda x: x * 2)
+        x = tdc.reduce(tdx(operator.add), range(10), 0)
+        self.assertEqual(x, sum(x * 2 for x in range(10)))
+
+    def test_filtering(self):
+        f = tdc.filtering(lambda x: x < 10)
+        x = tdc.reduce(f(operator.add), range(100), 0)
+        self.assertEqual(x, sum(range(10)))
+
+    def test_taking(self):
+        t = tdc.taking(10)
+        x = tdc.reduce(t(operator.add), range(100), 0)
+        self.assertEqual(x, sum(range(10)))
+
     def test_compose_mapping_and_filter(self):
         tdx = compose(
             tdc.mapping(lambda x: x * 2),

@@ -55,8 +55,11 @@ class Tests(unittest.TestCase):
 
         result = []
         f = composed(crt.append(result))
-        for i in range(1000):
-            f.send(i)
+        try:
+            for i in range(1000):
+                f.send(i)
+        except crt.StopConsumption:
+            pass
 
         expected = list(itertools.islice(
             (x * 2 for x in itertools.islice(range(1000), 5)), 5))
