@@ -46,10 +46,12 @@ def _make_transducer_factory(make_coroutine):
     """
     def make_transducer(*args, **kwargs):
         def transducer(reducer):
-            rh = _ResultHolder() # This holds the final transduction result.
+            rh = _ResultHolder()  # This holds the final transduction result.
 
-            # The coroutine transformation pipeline, ending in `reduction_target`.
-            pipeline = make_coroutine(*args, **kwargs)(_reduction_target(reducer, rh))
+            # The coroutine transformation pipeline, ending in
+            # `reduction_target`.
+            pipeline = make_coroutine(*args, **kwargs)(
+                _reduction_target(reducer, rh))
 
             def new_reducer(result, new_value):
                 """A reducer that uses a coroutine pipeline to transform its input
