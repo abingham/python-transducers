@@ -94,6 +94,25 @@ def filtering(pred):
     return gen
 
 
+def mapcatting(f):
+    """Create a coroutine that mapcats sequences of sequences.
+
+
+    >>> result = []
+    >>> m = mapcatting(lambda x: reversed(x))
+    >>> consume(m(append(result)),
+    ...     [(3, 2, 1, 0), (6, 5, 4), (9, 8, 7)])
+     >>> assert result == list(range(10))
+    """
+    @coroutine
+    def gen(target):
+        while True:
+            xs = yield
+            for x in f(xs):
+                target.send(x)
+
+    return gen
+
 def taking(n):
     """Create a coroutine that only passes along the first `n` items it
     receives.

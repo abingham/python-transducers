@@ -29,6 +29,16 @@ class Tests(unittest.TestCase):
             result,
             [x for x in range(10) if x % 2 == 0])
 
+    def test_mapcatting_doctest(self):
+        result = []
+        m = crt.mapcatting(lambda x: reversed(x))
+        crt.consume(m(crt.append(result)),
+                    [(3, 2, 1, 0), (6, 5, 4), (9, 8, 7)])
+        Self.assertListEqual(
+            result,
+            list(range(10)))
+
+
     def test_taking_doctest(self):
         result = []
         crt.consume(crt.taking(5)(
@@ -51,7 +61,6 @@ class Tests(unittest.TestCase):
             self.assertEqual(
                 e.args[0],
                 'taking() requires a positive value.')
-
 
     def test_taking_works_for_size_one(self):
         crt.taking(1)
