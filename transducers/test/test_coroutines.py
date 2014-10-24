@@ -44,6 +44,18 @@ class Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             crt.taking(0)
 
+    def test_taking_value_error_message(self):
+        try:
+            crt.taking(-5)
+        except ValueError as e:
+            self.assertEqual(
+                e.args[0],
+                'taking() requires a positive value.')
+
+
+    def test_taking_works_for_size_one(self):
+        crt.taking(1)
+
     def test_taking_while_doctest(self):
         result = []
         crt.consume(crt.taking_while(lambda x: x < 5)(
