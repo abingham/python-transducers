@@ -68,6 +68,21 @@ Testing
 python -m unittest discover transducers/test
 ```
 
+MMutation testing
+----------------
+
+If you want to run mutation testing using
+[`mut.py`](https://bitbucket.org/khalas/mutpy), you can use an
+invocation like this:
+
+```
+mut.py --target transducers --unit-test transducers.test.test_coroutines transducers.test.test_transducers
+```
+
+This can be a bit fiddly, and it's mostly useful for developers. But
+it's fun to play with if you're interested in that kind of stuff. And
+of course you need to install `mut.py` yourself.
+
 Coroutines
 ==========
 
