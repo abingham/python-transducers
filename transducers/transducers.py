@@ -91,6 +91,7 @@ class StopTransduction(Exception):
 
 mapping = _make_transducer_factory(coroutines.mapping)
 filtering = _make_transducer_factory(coroutines.filtering)
+mapcatting = _make_transducer_factory(coroutines.mapcatting)
 taking = _make_transducer_factory(coroutines.taking)
 taking_while = _make_transducer_factory(coroutines.taking_while)
 
@@ -126,3 +127,7 @@ def map(func, seq):
 
 def filter(pred, seq):
     return reduce(filtering(pred)(conj), seq, [])
+
+
+def mapcat(func, seq):
+    return reduce(mapcatting(func)(conj), seq, [])

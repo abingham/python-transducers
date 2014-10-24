@@ -29,6 +29,11 @@ class Tests(unittest.TestCase):
         x = tdc.reduce(f(operator.add), range(100), 0)
         self.assertEqual(x, sum(range(10)))
 
+    def test_mapcatting(self):
+        m = tdc.mapcatting(reversed)
+        x = tdc.reduce(m(tdc.conj), ((3, 2, 1, 0), (6, 5, 4)), [])
+        self.assertListEqual(x, list(range(7)))
+
     def test_taking(self):
         t = tdc.taking(10)
         x = tdc.reduce(t(operator.add), range(100), 0)
@@ -110,3 +115,12 @@ class Tests(unittest.TestCase):
         self.assertListEqual(
             result,
             [x for x in range(10) if x < 5])
+
+    def test_mapcat_simple(self):
+        result = tdc.mapcat(
+            reversed,
+            ((3, 2, 1, 0), (6, 5, 4)))
+
+        self.assertListEqual(
+            result,
+            list(range(7)))
