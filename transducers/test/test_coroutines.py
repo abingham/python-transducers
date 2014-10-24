@@ -13,6 +13,38 @@ def load_tests(loader, tests, ignore):
 
 class Tests(unittest.TestCase):
 
+    def test_mapping_doctest(self):
+        result = []
+        m = crt.mapping(lambda x: x * 2)
+        crt.consume(m(crt.append(result)), range(10))
+        self.assertListEqual(
+            result,
+            [x * 2 for x in range(10)])
+
+    def test_filtering_doctest(self):
+        result = []
+        f = crt.filtering(lambda x: x % 2 == 0)
+        crt.consume(f(crt.append(result)), range(10))
+        self.assertListEqual(
+            result,
+            [x for x in range(10) if x % 2 == 0])
+
+    def test_taking_doctest(self):
+        result = []
+        crt.consume(crt.taking(5)(
+            crt.append(result)), range(1000))
+        self.assertListEqual(
+            result,
+            list(range(5)))
+
+    def test_taking_while_doctest(self):
+        result = []
+        crt.consume(crt.taking_while(lambda x: x < 5)(
+            crt.append(result)), range(1000))
+        self.assertListEqual(
+            result,
+            list(range(5)))
+
     def test_compose_mapping_and_filter(self):
         composed = compose(
             crt.mapping(lambda x: x * 2),
