@@ -105,15 +105,11 @@ def taking(n):
     """
     @coroutine
     def gen(target):
-        count = 0
-        while True:
+        for _ in range(n):
             x = (yield)
-            if count < n:
-                target.send(x)
-                count += 1
+            target.send(x)
 
-            if count == n:
-                raise StopConsumption()
+        raise StopConsumption()
 
     return gen
 
