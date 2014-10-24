@@ -37,6 +37,13 @@ class Tests(unittest.TestCase):
             result,
             list(range(5)))
 
+    def test_taking_requires_a_positive_argument(self):
+        with self.assertRaises(ValueError):
+            crt.taking(-5)
+
+        with self.assertRaises(ValueError):
+            crt.taking(0)
+
     def test_taking_while_doctest(self):
         result = []
         crt.consume(crt.taking_while(lambda x: x < 5)(

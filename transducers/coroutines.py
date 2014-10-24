@@ -98,11 +98,16 @@ def taking(n):
     """Create a coroutine that only passes along the first `n` items it
     receives.
 
+    This raises a `ValueError` if `n <= 0`.
+
     >>> result = []
     >>> consume(taking(5)(append(result)), range(1000))
     >>> assert result == list(range(5))
 
     """
+    if n <= 0:
+        raise ValueError('taking() requires a positive value.')
+
     @coroutine
     def gen(target):
         for _ in range(n):
