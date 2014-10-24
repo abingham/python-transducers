@@ -34,10 +34,9 @@ class Tests(unittest.TestCase):
         m = crt.mapcatting(lambda x: reversed(x))
         crt.consume(m(crt.append(result)),
                     [(3, 2, 1, 0), (6, 5, 4), (9, 8, 7)])
-        Self.assertListEqual(
+        self.assertListEqual(
             result,
             list(range(10)))
-
 
     def test_taking_doctest(self):
         result = []
