@@ -77,15 +77,16 @@ class StopTransduction(Exception):
     This allows reducers to terminate consumption of the input
     sequence early. This is useful e.g. for creating reducers which
     only process a limited number of input elements.
+
+    The final value of the reduction should be passed as the first
+    argument to the `StopTransduction` initializer.
     """
-    def __init__(self, value):
-        self._value = value
 
     @property
     def value(self):
         """The result of the reduction.
         """
-        return self._value
+        return self.args[0]
 
 
 mapping = _make_transducer_factory(coroutines.mapping)
