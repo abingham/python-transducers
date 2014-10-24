@@ -91,3 +91,22 @@ class Tests(unittest.TestCase):
         input_data = (i for i in range(100))
         tdc.reduce(lt_10(operator.add), input_data, 0)
         self.assertEqual(len(list(input_data)), 89)
+
+    def test_map_simple(self):
+        result = tdc.map(lambda x: x * 2, range(10))
+        self.assertListEqual(
+            result,
+            [x * 2 for x in range(10)])
+
+    def test_map_empty(self):
+        result = tdc.map(lambda x: x * 2, [])
+        self.assertListEqual(
+            result, [])
+
+    def test_filter_simple(self):
+        result = tdc.filter(
+            lambda x: x < 5,
+            range(10))
+        self.assertListEqual(
+            result,
+            [x for x in range(10) if x < 5])

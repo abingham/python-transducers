@@ -95,6 +95,8 @@ taking = _make_transducer_factory(coroutines.taking)
 taking_while = _make_transducer_factory(coroutines.taking_while)
 
 _REDUCE_NO_INITIAL = object()
+
+
 def reduce(func, seq, initial=_REDUCE_NO_INITIAL):
     """A drop-in replacement for `functools.reduce` which honors the
     transduction protocol for stopping reduction early when
@@ -107,3 +109,20 @@ def reduce(func, seq, initial=_REDUCE_NO_INITIAL):
             return functools.reduce(func, seq, initial)
     except StopTransduction as e:
         return e.value
+
+
+def conj(l, x):
+    """Append `x` to the list `l` and return `l`.
+
+    This is an analogue to clojure's `conj`.
+    """
+    l.append(x)
+    return l
+
+
+def map(func, seq):
+    return reduce(mapping(func)(conj), seq, [])
+
+
+def filter(pred, seq):
+    return reduce(filtering(pred)(conj), seq, [])
