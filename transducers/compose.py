@@ -12,9 +12,10 @@ def compose(c1, *composables):
     mapping-of-a-filtering:
 
     >>> import operator
+    >>> from transducers.transducers import filtering, mapping
     >>> tdx = compose(
-    ...     mapping(lambda x: x * 2),
-    ...     filtering(lambda x: x < 5))
+    ...     filtering(lambda x: x < 5),
+    ...     mapping(lambda x: x * 2))
     ...
     >>> x = reduce(tdx(operator.mul),
     ...            range(1, 10), 1)
@@ -26,6 +27,6 @@ def compose(c1, *composables):
     """
     def composite(terminus):
         return reduce(lambda r, n: n(r),
-                      chain([c1], composables),
+                      chain(reversed(composables), [c1]),
                       terminus)
     return composite

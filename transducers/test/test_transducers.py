@@ -46,8 +46,8 @@ class Tests(unittest.TestCase):
 
     def test_compose_mapping_and_filter(self):
         tdx = compose(
-            tdc.mapping(lambda x: x * 2),
-            tdc.filtering(lambda x: x < 5))
+            tdc.filtering(lambda x: x < 5),
+            tdc.mapping(lambda x: x * 2))
 
         x = tdc.reduce(tdx(operator.mul),
                    range(1, 10), 1)
@@ -60,9 +60,9 @@ class Tests(unittest.TestCase):
 
     def test_compose_three_transducers(self):
         tdx = compose(
-            tdc.filtering(lambda x: x % 2 == 0),
+            tdc.mapping(lambda x: x * 2),
             tdc.mapping(lambda x: x * x),
-            tdc.mapping(lambda x: x * 2))
+            tdc.filtering(lambda x: x % 2 == 0))
 
         x = tdc.reduce(tdx(operator.add),
                    range(100), 0)

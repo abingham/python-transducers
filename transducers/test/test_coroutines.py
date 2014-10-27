@@ -74,8 +74,8 @@ class Tests(unittest.TestCase):
 
     def test_compose_mapping_and_filter(self):
         composed = compose(
-            crt.mapping(lambda x: x * 2),
-            crt.filtering(lambda x: x < 5))
+            crt.filtering(lambda x: x < 5),
+            crt.mapping(lambda x: x * 2))
 
         result = []
         f = composed(crt.append(result))
@@ -87,9 +87,9 @@ class Tests(unittest.TestCase):
 
     def test_compose_three_coroutines(self):
         composed = compose(
-            crt.filtering(lambda x: x % 2 == 0),
+            crt.mapping(lambda x: x * 2),
             crt.mapping(lambda x: x * x),
-            crt.mapping(lambda x: x * 2))
+            crt.filtering(lambda x: x % 2 == 0))
 
         result = []
         f = composed(crt.append(result))
