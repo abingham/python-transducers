@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/abingham/python-transducers.png)](https://travis-ci.org/abingham/python-transducers)
 [![Code health](https://landscape.io/github/abingham/python-transducers/master/landscape.png)](https://landscape.io/github/abingham/python-transducers)
 
+**NOTE:** This project is going to sleep for the forseeable future. Active development of these ideas will take place [over here](https://bitbucket.org/sixty-north/python-transducers).
+
 ==================
 python-transducers
 ==================
